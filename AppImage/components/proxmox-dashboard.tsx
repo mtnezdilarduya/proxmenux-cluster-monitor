@@ -5,6 +5,7 @@ import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
 import { SystemOverview } from "./system-overview"
+import { ClusterOverview } from "./cluster-overview"
 import { StorageOverview } from "./storage-overview"
 import { NetworkMetrics } from "./network-metrics"
 import { VirtualMachines } from "./virtual-machines"
@@ -354,6 +355,8 @@ export function ProxmoxDashboard() {
     switch (activeTab) {
       case "overview":
         return "Overview"
+      case "cluster":
+        return "Cluster"
       case "storage":
         return "Storage"
       case "network":
@@ -568,12 +571,18 @@ export function ProxmoxDashboard() {
             {/* Issue #191: 10 tabs after adding About. The grid wraps via
                 Tabs primitives so the extra column doesn't push the
                 triggers off-screen on common laptop widths. */}
-            <TabsList className="hidden lg:grid w-full grid-cols-10 bg-card border border-border">
+            <TabsList className="hidden lg:grid w-full grid-cols-11 bg-card border border-border">
               <TabsTrigger
                 value="overview"
                 className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:rounded-md"
               >
                 Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="cluster"
+                className="data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:rounded-md"
+              >
+                Cluster
               </TabsTrigger>
               <TabsTrigger
                 value="storage"
@@ -661,6 +670,21 @@ export function ProxmoxDashboard() {
                   >
                     <LayoutDashboard className="h-5 w-5" />
                     <span>Overview</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setActiveTab("cluster")
+                      setMobileMenuOpen(false)
+                    }}
+                    className={`w-full justify-start gap-3 ${
+                      activeTab === "cluster"
+                        ? "bg-blue-500/10 text-blue-500 border-l-4 border-blue-500 rounded-l-none"
+                        : ""
+                    }`}
+                  >
+                    <Server className="h-5 w-5" />
+                    <span>Cluster</span>
                   </Button>
                   <Button
                     variant="ghost"
@@ -808,6 +832,10 @@ export function ProxmoxDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 md:space-y-6">
           <TabsContent value="overview" className="space-y-4 md:space-y-6 mt-0">
             <SystemOverview key={`overview-${componentKey}`} />
+          </TabsContent>
+
+          <TabsContent value="cluster" className="space-y-4 md:space-y-6 mt-0">
+            <ClusterOverview key={`cluster-${componentKey}`} />
           </TabsContent>
 
           <TabsContent value="storage" className="space-y-4 md:space-y-6 mt-0">
