@@ -32,7 +32,23 @@ def require_auth(f):
         # If auth is disabled or declined, allow access
         if not config.get("enabled", False) or config.get("declined", False):
             return f(*args, **kwargs)
-        
+
+        # Node-to-node trust: a sibling node aggregating the cluster view
+        # authenticates machine-to-machine with the shared cluster token
+        # (replicated across the cluster by pmxcfs under /etc/pve). This
+        # lets the aggregator reach this node's existing endpoints
+        # (/api/system, /api/vms, ...) without a user JWT. The token never
+        # leaves the cluster's private filesystem and is only accepted
+        # here, so it grants read access equivalent to a logged-in viewer.
+        cluster_token = request.headers.get('X-Cluster-Token')
+        if cluster_token:
+            try:
+                from cluster_manager import is_valid_cluster_token
+                if is_valid_cluster_token(cluster_token):
+                    return f(*args, **kwargs)
+            except Exception:
+                pass
+
         # Auth is enabled, require token
         auth_header = request.headers.get('Authorization')
         
