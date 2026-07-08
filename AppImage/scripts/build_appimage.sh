@@ -143,6 +143,9 @@ cp "$SCRIPT_DIR/flask_notification_routes.py" "$APP_DIR/usr/bin/" 2>/dev/null ||
 cp "$SCRIPT_DIR/oci_manager.py" "$APP_DIR/usr/bin/" 2>/dev/null || echo "⚠️  oci_manager.py not found"
 cp "$SCRIPT_DIR/flask_oci_routes.py" "$APP_DIR/usr/bin/" 2>/dev/null || echo "⚠️  flask_oci_routes.py not found"
 cp "$SCRIPT_DIR/oci/description_templates.py" "$APP_DIR/usr/bin/" 2>/dev/null || echo "⚠️  description_templates.py not found"
+# EXPERIMENTAL cluster-overview fork: zero-config multi-node aggregation.
+cp "$SCRIPT_DIR/cluster_manager.py" "$APP_DIR/usr/bin/" 2>/dev/null || echo "⚠️  cluster_manager.py not found"
+cp "$SCRIPT_DIR/flask_cluster_routes.py" "$APP_DIR/usr/bin/" 2>/dev/null || echo "⚠️  flask_cluster_routes.py not found"
 
 # Copy AI providers module for notification enhancement
 echo "📋 Copying AI providers module..."
