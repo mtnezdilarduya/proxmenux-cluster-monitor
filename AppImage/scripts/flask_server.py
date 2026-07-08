@@ -182,13 +182,18 @@ app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # 1 MB
 # in that case. We keep the dev origin (`localhost:3000` for `npm run dev`)
 # always allowed, and let operators add their own deployment URL via the
 # PROXMENUX_CORS_ORIGINS env var (comma-separated).
+# TEMP (side-by-side test): run our fork on 38008 so it coexists with the
+# original ProxMenux Monitor on 8008 for real-time comparison. Override with
+# PROXMENUX_LISTEN_PORT. Revert to 8008 before any release.
+LISTEN_PORT = int(os.environ.get("PROXMENUX_LISTEN_PORT", "38008"))
+
 _cors_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://localhost:8008",
-    "http://127.0.0.1:8008",
-    "https://localhost:8008",
-    "https://127.0.0.1:8008",
+    f"http://localhost:{LISTEN_PORT}",
+    f"http://127.0.0.1:{LISTEN_PORT}",
+    f"https://localhost:{LISTEN_PORT}",
+    f"https://127.0.0.1:{LISTEN_PORT}",
 ]
 _extra_origins = os.environ.get("PROXMENUX_CORS_ORIGINS", "").strip()
 if _extra_origins:
@@ -12054,7 +12059,7 @@ if __name__ == '__main__':
                 # net.ipv6.bindv6only=0 (the default). Issue #192 — IPv4-only
                 # listening broke ProxMenux on dual-stack / v6-only hosts.
                 server = pywsgi.WSGIServer(
-                    ('::', 8008),
+                    ('::', LISTEN_PORT),
                     app,
                     ssl_context=ssl_context
                 )
@@ -12067,14 +12072,14 @@ if __name__ == '__main__':
                 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
                 ssl_context.load_cert_chain(ssl_cert, ssl_key)
                 print("[ProxMenux] Starting Flask server with SSL (using flask-sock for WebSockets)...")
-                app.run(host='::', port=8008, debug=False, ssl_context=ssl_context)
+                app.run(host='::', port=LISTEN_PORT, debug=False, ssl_context=ssl_context)
         else:
             # HTTP mode - use Flask dev server (simpler, works fine without SSL)
             print("[ProxMenux] Starting Flask server with HTTP...")
-            app.run(host='::', port=8008, debug=False)
+            app.run(host='::', port=LISTEN_PORT, debug=False)
     except Exception as e:
         if ssl_ctx and not gevent_available:
             print(f"[ProxMenux] SSL startup failed ({e}), falling back to HTTP")
-            app.run(host='::', port=8008, debug=False)
+            app.run(host='::', port=LISTEN_PORT, debug=False)
         else:
             raise e

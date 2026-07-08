@@ -41,7 +41,10 @@ MEMBERS_FILE = os.environ.get("PROXMENUX_MEMBERS_FILE", "/etc/pve/.members")
 TOKEN_FILE = os.environ.get(
     "PROXMENUX_CLUSTER_TOKEN_FILE", "/etc/pve/proxmenux/cluster_token"
 )
-API_PORT = int(os.environ.get("PROXMENUX_API_PORT", "8008"))
+# TEMP (side-by-side test): peers run our fork on 38008 (coexisting with the
+# original ProxMenux Monitor on 8008). Override with PROXMENUX_API_PORT.
+# Revert to 8008 before any release.
+API_PORT = int(os.environ.get("PROXMENUX_API_PORT", "38008"))
 
 # Per-peer HTTP timeout. Generous but bounded — an unreachable node must
 # never stall the whole aggregation. The aggregator queries peers in

@@ -8,8 +8,12 @@
  * Default: 8008 (production)
  * Can be changed to 8009 for beta testing
  * This can also be set via NEXT_PUBLIC_API_PORT environment variable
+ *
+ * TEMP (side-by-side test): default set to 38008 so this fork's static
+ * frontend (served on 38008) calls its OWN backend instead of the original
+ * ProxMenux Monitor still running on 8008. Revert to 8008 before any release.
  */
-export const API_PORT = process.env.NEXT_PUBLIC_API_PORT || "8008"
+export const API_PORT = process.env.NEXT_PUBLIC_API_PORT || "38008"
 
 /**
  * Gets the base URL for API calls
