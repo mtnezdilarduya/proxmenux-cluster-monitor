@@ -435,7 +435,13 @@ export function ProxmoxDashboard() {
                 <Server className="h-8 w-8 md:h-6 md:w-6 text-primary absolute fallback-icon hidden" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg md:text-xl font-semibold text-foreground truncate">ProxMenux Monitor</h1>
+                <div className="flex items-center gap-2 min-w-0">
+                  <h1 className="text-lg md:text-xl font-semibold text-foreground truncate">ProxMenux Monitor</h1>
+                  {/* EXPERIMENTAL cluster fork marker — distinguishes this build from the official monitor at a glance. */}
+                  <span className="shrink-0 rounded-full bg-amber-500/15 text-amber-600 text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wide">
+                    cluster-fork
+                  </span>
+                </div>
                 <p className="text-xs md:text-sm text-muted-foreground">Proxmox System Dashboard</p>
                 <div className="lg:hidden flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
                   <Server className="h-3 w-3" />
@@ -886,7 +892,10 @@ export function ProxmoxDashboard() {
         </Tabs>
 
         <footer className="mt-8 md:mt-12 pt-4 md:pt-6 border-t border-border text-center text-xs md:text-sm text-muted-foreground">
-          <p className="font-medium mb-2">ProxMenux Monitor v1.2.2.1-beta</p>
+          <p className="font-medium mb-2">
+            ProxMenux Monitor v1.2.2.1-beta
+            <span className="text-amber-600"> · cluster-fork (experimental)</span>
+          </p>
           <p>
             <a
               href="https://ko-fi.com/macrimi"
