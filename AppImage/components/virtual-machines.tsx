@@ -47,6 +47,7 @@ interface VMData {
   name: string
   status: string
   type: string
+  node?: string
   cpu: number
   maxcpu?: number
   mem: number
@@ -594,7 +595,7 @@ export function VirtualMachines() {
     error,
     isLoading,
     mutate,
-  } = useSWR<VMData[]>("/api/vms", fetcher, {
+  } = useSWR<VMData[]>("/api/cluster/vms", fetcher, {
     refreshInterval: 2500,
     revalidateOnFocus: true,
     revalidateOnReconnect: true,
@@ -605,6 +606,8 @@ export function VirtualMachines() {
   const [selectedVM, setSelectedVM] = useState<VMData | null>(null)
   const [vmDetails, setVMDetails] = useState<VMDetails | null>(null)
   const [controlLoading, setControlLoading] = useState(false)
+  // Cluster-fork: filter the (now cluster-wide) guest list by node.
+  const [nodeFilter, setNodeFilter] = useState<string>("all")
   // Destructive control confirmation. `Force Stop` and `Reboot` skip the OS
   // shutdown sequence and can corrupt running guests; gate them behind a
   // typed-VMID match prompt to prevent misclicks. See audit Tier 2 #17.
@@ -1049,6 +1052,19 @@ const handleDownloadLogs = async (vmid: number, vmName: string) => {
   // Ensure vmData is always an array (backend may return object on error)
   const safeVMData = Array.isArray(vmData) ? vmData : []
 
+  // Cluster-fork: the list is cluster-wide now. Derive the set of nodes
+  // present (for the filter dropdown) and the node-filtered view used to
+  // render the guest list. The summary cards above stay cluster-wide.
+  const nodesInData = useMemo(
+    () =>
+      Array.from(new Set(safeVMData.map((vm) => vm.node).filter(Boolean))).sort() as string[],
+    [safeVMData],
+  )
+  const displayVMData = useMemo(
+    () => (nodeFilter === "all" ? safeVMData : safeVMData.filter((vm) => vm.node === nodeFilter)),
+    [safeVMData, nodeFilter],
+  )
+
   // Render the "📦 N updates / 🛡 N security" badge next to an LXC in
   // the dashboard list. Used ONLY in the card row alongside Uptime —
   // the modal surfaces the same info via a dedicated tab instead of
@@ -1476,18 +1492,35 @@ const handleDownloadLogs = async (vmid: number, vmName: string) => {
       </div>
 
       <Card className="bg-card border-border">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2 text-xl lg:text-2xl font-bold text-foreground">
             <Server className="h-6 w-6" />
             Virtual Machines & Containers
           </CardTitle>
+          {/* Cluster-fork: node filter for the cluster-wide guest list. */}
+          {nodesInData.length > 1 && (
+            <Select value={nodeFilter} onValueChange={setNodeFilter}>
+              <SelectTrigger className="w-auto min-w-[150px] flex-shrink-0">
+                <Network className="h-4 w-4 mr-1 text-muted-foreground" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All nodes ({safeVMData.length})</SelectItem>
+                {nodesInData.map((n) => (
+                  <SelectItem key={n} value={n}>
+                    {n} ({safeVMData.filter((vm) => vm.node === n).length})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </CardHeader>
         <CardContent>
-          {safeVMData.length === 0 ? (
+          {displayVMData.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">No virtual machines found</div>
           ) : (
             <div className="space-y-3">
-              {safeVMData.map((vm) => {
+              {displayVMData.map((vm) => {
                 const cpuPercent = (vm.cpu * 100).toFixed(1)
                 const memPercent = vm.maxmem > 0 ? ((vm.mem / vm.maxmem) * 100).toFixed(1) : "0"
                 const memGB = (vm.mem / 1024 ** 3).toFixed(1)
@@ -1513,6 +1546,15 @@ const handleDownloadLogs = async (vmid: number, vmName: string) => {
                           {typeBadge.icon}
                           {typeBadge.label}
                         </Badge>
+                        {vm.node && (
+                          <Badge
+                            variant="outline"
+                            className="flex-shrink-0 gap-1 bg-purple-500/10 text-purple-500 border-purple-500/20"
+                          >
+                            <Network className="h-3 w-3" />
+                            {vm.node}
+                          </Badge>
+                        )}
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold text-foreground truncate">
                             {vm.name}
@@ -1641,7 +1683,18 @@ const handleDownloadLogs = async (vmid: number, vmName: string) => {
                             <span className="truncate">{vm.name}</span>
                             {vm.type === "lxc" && renderLxcUpdateBadge(vm.update_check, true)}
                           </div>
-                          <div className="text-[10px] text-muted-foreground">ID: {vm.vmid}</div>
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            <span>ID: {vm.vmid}</span>
+                            {vm.node && (
+                              <>
+                                <span>·</span>
+                                <span className="flex items-center gap-0.5 text-purple-500">
+                                  <Network className="h-2.5 w-2.5" />
+                                  {vm.node}
+                                </span>
+                              </>
+                            )}
+                          </div>
                         </div>
 
                         <div className="flex items-center gap-3 flex-shrink-0">

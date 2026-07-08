@@ -4893,6 +4893,28 @@ def get_proxmox_vms():
         # Return empty array instead of error object - frontend expects array
         return []
 
+
+def _resolve_guest_node(vmid):
+    """Return the cluster node a given guest (vmid) currently lives on.
+
+    Cluster-fork helper: per-guest endpoints historically hardcoded the
+    local node in the pvesh path (`/nodes/<local>/…`), which only works for
+    guests on the browsed node. Since the consolidated VMs & LXCs view lists
+    guests from every node, we look the guest up in the already-cached
+    `pvesh /cluster/resources` payload and return ITS node. pvesh routes
+    cluster-wide, so `/nodes/<that-node>/…` works from any node. The value
+    comes from pvesh output (not user input), so it's safe to interpolate.
+    Falls back to the local node when the guest isn't in the cache yet.
+    """
+    try:
+        for resource in (get_cached_pvesh_cluster_resources_vm() or []):
+            if resource.get('vmid') == vmid and resource.get('node'):
+                return resource.get('node')
+    except Exception:
+        pass
+    return get_proxmox_node_name()
+
+
 def get_cached_ipmi_sensors():
     """Get ipmitool sensor output with 10s cache. Shared between fans/power parsers.
 
@@ -9469,8 +9491,9 @@ def api_vm_metrics(vmid):
             pass
             return jsonify({'error': f'Invalid timeframe. Must be one of: {", ".join(valid_timeframes)}'}), 400
         
-        # Get local node name
-        local_node = get_proxmox_node_name()
+        # Cluster-fork: resolve the guest's actual node so RRD metrics work
+        # for guests on any cluster node, not just the browsed one.
+        local_node = _resolve_guest_node(vmid)
 
         # Determine if it's a qemu VM or lxc container.
         #
@@ -11262,9 +11285,10 @@ def get_vm_config(vmid):
     """Get detailed configuration for a specific VM/LXC"""
     try:
         # Get VM/LXC configuration
-        # node = socket.gethostname() # Get node name
-        node = get_proxmox_node_name()
-        
+        # Cluster-fork: resolve the guest's actual node (not just the local
+        # one) so the detail modal works for guests on any cluster node.
+        node = _resolve_guest_node(vmid)
+
         result = subprocess.run(
             ['pvesh', 'get', f'/nodes/{node}/qemu/{vmid}/config', '--output-format', 'json'],
             capture_output=True,
