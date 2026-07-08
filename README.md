@@ -23,6 +23,9 @@
 A personal, throwaway fork of **[ProxMenux Monitor](https://github.com/MacRimi/ProxMenux)** (the `AppImage/` web dashboard) used to prototype a **zero-config, multi-node cluster overview**:
 
 - A new **"Cluster"** tab that aggregates every node of a Proxmox cluster into a single view — total CPU (thread-weighted), memory, VM/LXC rollup, and per-node cards — with **no IPs or credentials to configure**.
+- **Cluster-aware individual tabs.** Beyond the dedicated Cluster tab, the existing per-node tabs are being made cluster-wide too:
+  - *Aggregate tabs* (e.g. **VMs & LXCs**) list guests from **every** node at once, each tagged with its node, with a node filter — while per-guest actions (detail, start/stop, metrics) route to the guest's real node automatically.
+  - *Per-node tabs* (Hardware, Network, Logs, …) will become node-pickers: you select a cluster node and its data loads.
 - The backend of the node you're browsing auto-discovers its peers from `/etc/pve/.members` (replicated by pmxcfs) and fans out to each peer's existing API using a shared token stored under `/etc/pve/proxmenux/` (also cluster-replicated). Nothing to set up by hand.
 
 This is a **prototype**. The upstream project is the real, maintained, supported product.
