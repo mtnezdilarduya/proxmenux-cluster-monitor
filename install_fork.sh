@@ -27,6 +27,16 @@ ASSET_NAME="ProxMenux-Cluster-Fork.AppImage"
 APPIMAGE_URL="${PROXMENUX_FORK_APPIMAGE_URL:-https://github.com/mtnezdilarduya/proxmenux-cluster-monitor/releases/latest/download/${ASSET_NAME}}"
 APPIMAGE_PATH="$INSTALL_DIR/$ASSET_NAME"
 
+# TEMPORARY firewall rule — tied to the TEMPORARY side-by-side port 38008.
+# This exists only so the fork is reachable (UI + node-to-node cluster
+# fan-out) while it runs next to the official monitor on 8008. It is scoped
+# to $LISTEN_PORT and tagged so `--uninstall` can remove exactly this rule.
+# When the fork goes back to 8008 (the real port), this whole block is moot
+# and must be dropped along with the port change.
+HOST_FW="/etc/pve/local/host.fw"
+FW_RULE_TAG="ProxMenux FORK (TEMP port ${LISTEN_PORT} - remove via install_fork.sh --uninstall)"
+FW_RULE_LINE="IN ACCEPT -p tcp -dport ${LISTEN_PORT} -log nolog # ${FW_RULE_TAG}"
+
 # ── Colours ───────────────────────────────────────────────────────────────
 if [ -t 1 ]; then
     RD="\033[01;31m"; GN="\033[1;92m"; YW="\033[33m"; BL="\033[36m"; CL="\033[0m"
@@ -51,6 +61,48 @@ fetch() {  # fetch <url> <dest>
     fi
 }
 
+# ── TEMPORARY firewall rule (tied to the TEMPORARY port ${LISTEN_PORT}) ────
+# Opens ${LISTEN_PORT}/tcp in the Proxmox host firewall so the fork is
+# reachable and its cluster fan-out can hit peer nodes. Idempotent, tagged,
+# and paired with remove_fw_rule() for clean uninstall. Only meaningful
+# while we run on the temporary side-by-side port — drop it when reverting
+# to 8008.
+add_fw_rule() {
+    command -v pve-firewall >/dev/null 2>&1 || { info "No pve-firewall found; skipping firewall rule."; return 0; }
+    mkdir -p "$(dirname "$HOST_FW")" 2>/dev/null || true
+
+    if [ -f "$HOST_FW" ] && grep -qF "$FW_RULE_TAG" "$HOST_FW"; then
+        ok "Firewall rule for ${LISTEN_PORT}/tcp already present."
+        return 0
+    fi
+
+    if [ -f "$HOST_FW" ] && grep -q '^\[RULES\]' "$HOST_FW"; then
+        # Insert right after the [RULES] header.
+        awk -v rule="$FW_RULE_LINE" '
+            {print}
+            !done && /^\[RULES\]/ {print rule; done=1}
+        ' "$HOST_FW" > "${HOST_FW}.tmp" && mv "${HOST_FW}.tmp" "$HOST_FW"
+    else
+        # No [RULES] section yet — append one.
+        { [ -f "$HOST_FW" ] && [ -n "$(tail -c1 "$HOST_FW" 2>/dev/null)" ] && echo ""; \
+          echo "[RULES]"; echo "$FW_RULE_LINE"; } >> "$HOST_FW"
+    fi
+
+    if pve-firewall reload >/dev/null 2>&1; then
+        ok "Firewall rule added (TEMP): ${LISTEN_PORT}/tcp allowed for the fork."
+    else
+        warn "Rule written to $HOST_FW but 'pve-firewall reload' failed — reload manually."
+    fi
+}
+
+remove_fw_rule() {
+    [ -f "$HOST_FW" ] || return 0
+    grep -qF "$FW_RULE_TAG" "$HOST_FW" || return 0
+    grep -vF "$FW_RULE_TAG" "$HOST_FW" > "${HOST_FW}.tmp" && mv "${HOST_FW}.tmp" "$HOST_FW"
+    command -v pve-firewall >/dev/null 2>&1 && pve-firewall reload >/dev/null 2>&1 || true
+    ok "Temporary firewall rule for ${LISTEN_PORT}/tcp removed."
+}
+
 # ── Uninstall ─────────────────────────────────────────────────────────────
 uninstall_fork() {
     warn "Removing the EXPERIMENTAL fork (the official monitor is left untouched)…"
@@ -61,6 +113,7 @@ uninstall_fork() {
     rm -f "$SERVICE_FILE"
     systemctl daemon-reload 2>/dev/null || true
     rm -rf "$INSTALL_DIR"
+    remove_fw_rule   # drop the TEMPORARY ${LISTEN_PORT}/tcp rule this installer added
     ok "Fork removed. The official proxmenux-monitor.service (if any) was not modified."
     exit 0
 }
@@ -143,14 +196,17 @@ sleep 3
 
 # ── Report ────────────────────────────────────────────────────────────────
 if systemctl is-active --quiet "${FORK_NAME}.service"; then
+    # Open the TEMPORARY port ${LISTEN_PORT} in the host firewall so the UI and
+    # the node-to-node cluster fan-out are reachable. Tagged + reverted on
+    # --uninstall. This is only needed because of the temporary side-by-side
+    # port; it goes away when the fork returns to 8008.
+    add_fw_rule
+
     IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
     echo
     ok "Fork monitor is running."
     echo -e "   ${BL}→${CL} http://${IP:-<node-ip>}:${LISTEN_PORT}"
     echo -e "   ${BL}→${CL} The official monitor (if installed) is still on :8008, untouched."
-    echo
-    warn "If the Proxmox firewall is enabled, allow ${LISTEN_PORT}/tcp between nodes"
-    warn "so the cluster overview can reach its peers."
 else
     die "Service failed to start. Inspect: journalctl -u ${FORK_NAME} -n 50 --no-pager"
 fi
