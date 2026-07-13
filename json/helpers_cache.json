@@ -360,6 +360,7 @@
       "Documents & Notes"
     ],
     "notes": [
+      "Admin Login under http://$IP:3010/admin/, credentials can be found with cat /root/affine.creds",
       "Initial build takes 20-30 minutes due to native module compilation."
     ],
     "warnings": [
