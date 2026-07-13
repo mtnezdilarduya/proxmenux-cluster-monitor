@@ -5744,7 +5744,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/flame.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -5905,7 +5905,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/fmd.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -6033,7 +6033,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/forgejo.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -6401,7 +6401,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/geopulse.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -6765,7 +6765,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/gluetun.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [],
     "config_path": "/opt/gluetun-data/.env",
@@ -6998,7 +6998,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/gramps.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "pve"
@@ -7376,7 +7376,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/hermes-agent.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -7682,7 +7682,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/homelable.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -8292,7 +8292,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/invoiceshelf.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -8359,7 +8359,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/ironclaw.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -8393,7 +8393,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/ironclaw.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -8495,7 +8495,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/iventoy.webp",
     "updateable": false,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -8704,7 +8704,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/jitsi-meet.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -8841,7 +8841,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/kan.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -8935,7 +8935,7 @@
     ],
     "port": 443,
     "website": "https://www.kasmweb.com/",
-    "documentation": "https://www.kasmweb.com/docs/",
+    "documentation": "https://docs.kasm.com/docs",
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/kasm-workspaces.webp",
     "updateable": true,
     "privileged": true,
@@ -9214,7 +9214,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/kiwix.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
@@ -14494,7 +14494,7 @@
     "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/pinchflat.webp",
     "updateable": true,
     "privileged": false,
-    "has_arm": false,
+    "has_arm": true,
     "is_dev": false,
     "execute_in": [
       "lxc"
