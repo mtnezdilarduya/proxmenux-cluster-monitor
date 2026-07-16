@@ -1879,6 +1879,7 @@
       "Miscellaneous"
     ],
     "notes": [
+      "Register your User in Frontend: `http://LXC_IP:8080/register`",
       "Habit data is stored in /opt/beaverhabits/.user.",
       "Set TRUSTED_LOCAL_EMAIL in the service environment to skip authentication for a specific email."
     ],
@@ -1890,7 +1891,7 @@
     "updateable": true,
     "privileged": false,
     "has_arm": true,
-    "is_dev": true,
+    "is_dev": false,
     "execute_in": [
       "lxc"
     ],
@@ -12540,7 +12541,7 @@
     "updateable": true,
     "privileged": false,
     "has_arm": true,
-    "is_dev": true,
+    "is_dev": false,
     "execute_in": [
       "lxc"
     ],
@@ -18417,7 +18418,7 @@
     "updateable": true,
     "privileged": false,
     "has_arm": true,
-    "is_dev": true,
+    "is_dev": false,
     "execute_in": [
       "lxc"
     ],
