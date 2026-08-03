@@ -35,6 +35,42 @@
     "os": "debian"
   },
   {
+    "name": "Portainer",
+    "slug": "Portainer",
+    "desc": "<p><strong>Portainer Community Edition</strong> is a lightweight service delivery platform for containerized applications that can be used to manage Docker, Swarm, Kubernetes and ACI environments. It is designed to be as simple to deploy as it is to use. The application allows you to manage all your orchestrator resources (containers, images, volumes, networks and more) through a &lsquo;smart&rsquo; GUI and/or an extensive API.</p>",
+    "script": "tools/addon/Portainer.sh",
+    "script_url": "https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/tools/addon/Portainer.sh",
+    "script_url_mirror": "https://git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main/tools/addon/Portainer.sh",
+    "type": "addon",
+    "type_id": "88xtxy57q80v38v",
+    "categories": [
+      "scriptcat00003"
+    ],
+    "category_names": [
+      "Containers & Docker"
+    ],
+    "notes": [
+      "This is an addon script intended to be used on top of an existing Docker container.",
+      "Execute within an existing LXC console (Debian / Ubuntu / Alpine supported)",
+      "To update, run the addon script again and select Update, or use: bash <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/tools/addon/portainer.sh)"
+    ],
+    "warnings": [],
+    "port": 9443,
+    "website": "https://www.portainer.io/",
+    "documentation": "https://docs.portainer.io/",
+    "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/portainer.webp",
+    "updateable": true,
+    "privileged": false,
+    "has_arm": true,
+    "is_dev": false,
+    "execute_in": [
+      "lxc",
+      "vm"
+    ],
+    "config_path": "/opt/portainer/compose.yaml",
+    "os": ""
+  },
+  {
     "name": "Actual Budget Prometheus Exporter",
     "slug": "actual-budget-prometheus-exporter",
     "desc": "Prometheus exporter for Actual Budget. Exposes account balances, budget balances, transaction counts and uncategorized/transfer counts as metrics on /metrics. Installs as an addon into an existing LXC (e.g. alongside your Actual Budget server) and builds from source with Node.js.",
@@ -4465,6 +4501,83 @@
     "os": "debian"
   },
   {
+    "name": "Decypharr",
+    "slug": "decypharr",
+    "desc": "Decypharr exposes a mock qBittorrent and SABnzbd API in front of debrid services, so Sonarr, Radarr, Lidarr and friends can send downloads to Real-Debrid, Torbox, AllDebrid, Debrid-Link or Premiumize as if they were talking to a normal download client. It also supports direct Usenet streaming via NNTP without a separate download client.",
+    "script": "ct/decypharr.sh",
+    "script_url": "https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/decypharr.sh",
+    "script_url_mirror": "https://git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main/ct/decypharr.sh",
+    "type": "lxc",
+    "type_id": "nm9bra8mzye2scg",
+    "categories": [
+      "scriptcat00014"
+    ],
+    "category_names": [
+      "*Arr Suite"
+    ],
+    "notes": [
+      "Open http://<IP>:8282 and complete the setup wizard to add your debrid provider and create the admin account. The configuration is written to /opt/decypharr_data/config.json, outside the app directory, so it survives updates.",
+      "The qBittorrent-compatible endpoint is what you add in Sonarr/Radarr as a download client - point it at http://<IP>:8282 and use the credentials you created in the wizard."
+    ],
+    "warnings": [
+      "The optional rclone/DFS mount features need /dev/fuse inside the container. In an unprivileged LXC add 'lxc.cgroup2.devices.allow: c 10:229 rwm' and 'lxc.mount.entry: /dev/fuse dev/fuse none bind,create=file' to the container config. WebDAV and the download-client API work without it."
+    ],
+    "port": 8282,
+    "website": "https://github.com/sirrobot01/decypharr",
+    "documentation": "https://sirrobot01.github.io/decypharr/",
+    "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/decypharr.webp",
+    "updateable": true,
+    "privileged": false,
+    "has_arm": true,
+    "is_dev": true,
+    "execute_in": [
+      "lxc"
+    ],
+    "config_path": "",
+    "os": "debian"
+  },
+  {
+    "name": "Defguard",
+    "slug": "defguard",
+    "desc": "Defguard is a WireGuard VPN server combined with an identity provider. It adds user enrollment, multi-factor authentication, OpenID Connect SSO and per-user access control on top of WireGuard, all managed from a web interface. This installs the Defguard Core service; gateways are deployed separately on the machines that terminate the VPN tunnels.",
+    "script": "ct/defguard.sh",
+    "script_url": "https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/defguard.sh",
+    "script_url_mirror": "https://git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main/ct/defguard.sh",
+    "type": "lxc",
+    "type_id": "nm9bra8mzye2scg",
+    "categories": [
+      "scriptcat00006"
+    ],
+    "category_names": [
+      "Authentication & Security"
+    ],
+    "notes": [
+      "This is only the Core service. VPN traffic is handled by a separate Defguard Gateway which connects back to the gRPC port 50055 on this container - see the upstream documentation for gateway deployment.",
+      "Data is stored in the local PostgreSQL database, not in /opt. Back up the 'defguard' database rather than the app directory."
+    ],
+    "warnings": [
+      "The generated admin password is stored as DEFGUARD_DEFAULT_ADMIN_PASSWORD in /etc/defguard/core.conf. Log in as 'admin' at http://<IP>:8000 and change it.",
+      "DEFGUARD_COOKIE_INSECURE=true is set so the web UI works over plain HTTP. When you put Defguard behind a TLS reverse proxy, remove that line and set DEFGUARD_URL to the public https URL, then restart the service."
+    ],
+    "port": 8000,
+    "website": "https://defguard.net/",
+    "documentation": "https://docs.defguard.net/",
+    "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/defguard.webp",
+    "updateable": true,
+    "privileged": false,
+    "has_arm": true,
+    "is_dev": true,
+    "execute_in": [
+      "lxc"
+    ],
+    "config_path": "",
+    "default_credentials": {
+      "username": "admin",
+      "password": ""
+    },
+    "os": "debian"
+  },
+  {
     "name": "degoog",
     "slug": "degoog",
     "desc": "Search aggregator that queries multiple engines and supports plugins, themes, and extension repositories.",
@@ -7304,6 +7417,47 @@
       "lxc"
     ],
     "config_path": "/opt/actions-runner",
+    "os": "debian"
+  },
+  {
+    "name": "GitLab",
+    "slug": "gitlab",
+    "desc": "GitLab CE is a complete DevOps platform: Git repository hosting, issue tracking, merge requests, CI/CD pipelines, a container registry and a package registry in one application. This installs the official Omnibus package, which bundles its own PostgreSQL, Redis, NGINX and Puma.",
+    "script": "ct/gitlab.sh",
+    "script_url": "https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/gitlab.sh",
+    "script_url_mirror": "https://git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main/ct/gitlab.sh",
+    "type": "lxc",
+    "type_id": "nm9bra8mzye2scg",
+    "categories": [
+      "scriptcat00020"
+    ],
+    "category_names": [
+      "AI / Coding & Dev-Tools"
+    ],
+    "notes": [
+      "EXTERNAL_URL is set to the container IP at install time. If you use a domain or a reverse proxy, change external_url in /etc/gitlab/gitlab.rb and run 'gitlab-ctl reconfigure'.",
+      "Omnibus bundles its own PostgreSQL, Redis and NGINX - do not install those separately in this container. Repositories live in /var/opt/gitlab; back up with 'gitlab-backup create' rather than copying directories."
+    ],
+    "warnings": [
+      "The initial root password is in /etc/gitlab/initial_root_password and is deleted automatically after 24 hours. Log in at http://<IP> as 'root' and change it right away.",
+      "GitLab Omnibus is resource-hungry. 8 GB RAM and 4 cores are the practical minimum; the official requirement is 4 GB RAM plus swap and it will feel slow below 8 GB. The first 'gitlab-ctl reconfigure' during installation takes several minutes."
+    ],
+    "port": 80,
+    "website": "https://about.gitlab.com/",
+    "documentation": "https://docs.gitlab.com/omnibus/",
+    "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/gitlab.webp",
+    "updateable": true,
+    "privileged": false,
+    "has_arm": false,
+    "is_dev": true,
+    "execute_in": [
+      "lxc"
+    ],
+    "config_path": "",
+    "default_credentials": {
+      "username": "root",
+      "password": ""
+    },
     "os": "debian"
   },
   {
@@ -11773,6 +11927,43 @@
     "os": "debian"
   },
   {
+    "name": "Home Assistant Matter Hub",
+    "slug": "matter-hub",
+    "desc": "Home Assistant Matter Hub publishes your Home Assistant entities as Matter devices, so Apple Home, Google Home, Amazon Alexa and any other Matter controller can see and control them. It acts as a Matter bridge in front of Home Assistant and needs only a long-lived access token to connect. This installs the actively maintained RiDDiX fork - the original t0bst4r project reached end of maintenance in January 2026.",
+    "script": "ct/matter-hub.sh",
+    "script_url": "https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/matter-hub.sh",
+    "script_url_mirror": "https://git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main/ct/matter-hub.sh",
+    "type": "lxc",
+    "type_id": "nm9bra8mzye2scg",
+    "categories": [
+      "scriptcat00017"
+    ],
+    "category_names": [
+      "ZigBee, Z-Wave & Matter"
+    ],
+    "notes": [
+      "Bridge data and fabric credentials are stored in /opt/matter-hub_data. Deleting that directory unpairs every controller and requires re-commissioning.",
+      "This is the community fork by RiDDiX. The original t0bst4r/home-assistant-matter-hub ended maintenance in January 2026 and receives no further fixes."
+    ],
+    "warnings": [
+      "Set HAMH_HOME_ASSISTANT_URL and HAMH_HOME_ASSISTANT_ACCESS_TOKEN in /opt/matter-hub.env, then run 'systemctl restart matter-hub'. Create the long-lived access token in Home Assistant under your user profile, Security tab.",
+      "Matter relies on IPv6 and mDNS. The container needs working IPv6 and must be on the same L2 network as your Matter controllers. Access points and switches that filter or rate-limit multicast are the most common cause of devices going 'No Response' after a while - check for IGMP snooping, mDNS/Bonjour filtering and AP isolation."
+    ],
+    "port": 8482,
+    "website": "https://github.com/RiDDiX/home-assistant-matter-hub",
+    "documentation": "https://riddix.github.io/home-assistant-matter-hub",
+    "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/home-assistant.webp",
+    "updateable": true,
+    "privileged": false,
+    "has_arm": true,
+    "is_dev": true,
+    "execute_in": [
+      "lxc"
+    ],
+    "config_path": "",
+    "os": "debian"
+  },
+  {
     "name": "Matter Server",
     "slug": "matter-server",
     "desc": "Open Home Foundation Matter Server - an officially certified Matter controller serving as the foundation for Matter support in Home Assistant and other projects.",
@@ -12892,6 +13083,42 @@
       "pve"
     ],
     "config_path": "/etc/navidrome/navidrome.toml",
+    "os": "debian"
+  },
+  {
+    "name": "nebula-sync",
+    "slug": "nebula-sync",
+    "desc": "nebula-sync keeps multiple Pi-hole v6 instances in sync by replicating the configuration of a primary Pi-hole to one or more replicas over the Pi-hole API. It can run a full Teleporter import/export or sync only selected features, on a cron schedule.",
+    "script": "ct/nebula-sync.sh",
+    "script_url": "https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/nebula-sync.sh",
+    "script_url_mirror": "https://git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main/ct/nebula-sync.sh",
+    "type": "lxc",
+    "type_id": "nm9bra8mzye2scg",
+    "categories": [
+      "scriptcat00005"
+    ],
+    "category_names": [
+      "Adblock & DNS"
+    ],
+    "notes": [
+      "Until PRIMARY and REPLICAS are configured the service restarts every 30 seconds. Check progress with 'journalctl -u nebula-sync -f'. The default schedule is CRON='0 * * * *' (hourly).",
+      "Requires Pi-hole v6 or newer on all instances - the v5 API is not supported. This is a third-party project and not part of the official Pi-hole project."
+    ],
+    "warnings": [
+      "This has no web interface. Edit /opt/nebula-sync.env and set PRIMARY and REPLICAS to your Pi-hole instances in the format 'http://host|password' (replicas comma-separated), then run 'systemctl restart nebula-sync'."
+    ],
+    "port": 0,
+    "website": "https://github.com/lovelaze/nebula-sync",
+    "documentation": "https://github.com/lovelaze/nebula-sync#configuration",
+    "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/pi-hole.webp",
+    "updateable": true,
+    "privileged": false,
+    "has_arm": true,
+    "is_dev": true,
+    "execute_in": [
+      "lxc"
+    ],
+    "config_path": "",
     "os": "debian"
   },
   {
@@ -17478,6 +17705,46 @@
     "os": "debian"
   },
   {
+    "name": "pyLoad",
+    "slug": "pyload",
+    "desc": "pyLoad is a lightweight download manager written in Python. It handles one-click hosters, container files (DLC, RSDF, CCF) and direct links, supports premium accounts, captcha solving and a plugin system, and is controlled through a web interface, a CLI or third-party clients.",
+    "script": "ct/pyload.sh",
+    "script_url": "https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/pyload.sh",
+    "script_url_mirror": "https://git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main/ct/pyload.sh",
+    "type": "lxc",
+    "type_id": "nm9bra8mzye2scg",
+    "categories": [
+      "scriptcat00011"
+    ],
+    "category_names": [
+      "Files & Downloads"
+    ],
+    "notes": [
+      "Downloads go to /opt/pyload_data/downloads and the configuration lives in /opt/pyload_data/userdir. Both are outside the app directory so they survive updates.",
+      "pyLoad is still in pre-release; the installer uses the pyload-ng pre-release channel because no stable release exists yet."
+    ],
+    "warnings": [
+      "Log in at http://<IP>:8000 with pyload/pyload and change the password immediately."
+    ],
+    "port": 8000,
+    "website": "https://pyload.net/",
+    "documentation": "https://github.com/pyload/pyload/wiki",
+    "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/pyload.webp",
+    "updateable": true,
+    "privileged": false,
+    "has_arm": true,
+    "is_dev": true,
+    "execute_in": [
+      "lxc"
+    ],
+    "config_path": "",
+    "default_credentials": {
+      "username": "pyload",
+      "password": "pyload"
+    },
+    "os": "debian"
+  },
+  {
     "name": "qBittorrent",
     "slug": "qbittorrent",
     "desc": "qBittorrent offers a user-friendly interface that allows users to search for and download torrent files easily. It also supports magnet links, which allow users to start downloading files without the need for a torrent file.",
@@ -19909,6 +20176,83 @@
     "privileged": false,
     "has_arm": true,
     "is_dev": false,
+    "execute_in": [
+      "lxc"
+    ],
+    "config_path": "",
+    "os": "debian"
+  },
+  {
+    "name": "Stalwart",
+    "slug": "stalwart",
+    "desc": "Stalwart is an all-in-one mail and collaboration server written in Rust. A single binary provides SMTP, IMAP, POP3, JMAP, CalDAV, CardDAV and WebDAV plus spam filtering, DKIM/SPF/DMARC and a web admin interface, with no external database required for a default install.",
+    "script": "ct/stalwart.sh",
+    "script_url": "https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/stalwart.sh",
+    "script_url_mirror": "https://git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main/ct/stalwart.sh",
+    "type": "lxc",
+    "type_id": "nm9bra8mzye2scg",
+    "categories": [
+      "scriptcat00000"
+    ],
+    "category_names": [
+      "Miscellaneous"
+    ],
+    "notes": [
+      "Configuration and mail data live in /opt/stalwart_data (etc, data, logs), outside the app directory, so they survive updates. Include this directory in your backups.",
+      "The default datastore is embedded RocksDB - no external database needed. PostgreSQL, MySQL, SQLite, S3, Redis and NATS backends can be configured later through the admin UI."
+    ],
+    "warnings": [
+      "On first start Stalwart runs in bootstrap mode and generates a temporary admin password. Read it with: journalctl -u stalwart | grep -A8 'bootstrap mode'. Then finish setup at http://<IP>:8080/admin.",
+      "Running a mail server that is reachable from the internet needs correct DNS (MX, SPF, DKIM, DMARC, rDNS/PTR) and a valid TLS certificate. Set STALWART_HOSTNAME and STALWART_PUBLIC_URL in /opt/stalwart_data/etc/stalwart.env, then restart the service."
+    ],
+    "port": 8080,
+    "website": "https://stalw.art/",
+    "documentation": "https://stalw.art/docs/",
+    "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/stalwart.webp",
+    "updateable": true,
+    "privileged": false,
+    "has_arm": true,
+    "is_dev": true,
+    "execute_in": [
+      "lxc"
+    ],
+    "config_path": "",
+    "default_credentials": {
+      "username": "admin",
+      "password": ""
+    },
+    "os": "debian"
+  },
+  {
+    "name": "Stash",
+    "slug": "stash",
+    "desc": "Stash is a self-hosted organizer for adult media collections. It scans your library, then enriches it with performers, studios, tags and scene metadata pulled from stash-box instances such as StashDB and from community scrapers, and serves everything through a web interface.",
+    "script": "ct/stash.sh",
+    "script_url": "https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/stash.sh",
+    "script_url_mirror": "https://git.community-scripts.org/community-scripts/ProxmoxVE/raw/branch/main/ct/stash.sh",
+    "type": "lxc",
+    "type_id": "nm9bra8mzye2scg",
+    "categories": [
+      "scriptcat00013"
+    ],
+    "category_names": [
+      "Media & Streaming"
+    ],
+    "notes": [
+      "On first start Stash runs a setup wizard at http://<IP>:9999 where you pick your media directories and optionally set a username and password.",
+      "Configuration, database and generated content live in /opt/stash_data, outside the app directory, so they survive updates. Include this directory in your backups."
+    ],
+    "warnings": [
+      "Media files are not stored in the container. Mount your library into the LXC (for example via a Proxmox bind mount) and point the Stash scan directories at the mount path."
+    ],
+    "port": 9999,
+    "website": "https://stashapp.cc/",
+    "documentation": "https://docs.stashapp.cc/",
+    "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons@main/webp/stash.webp",
+    "updateable": true,
+    "privileged": false,
+    "has_arm": true,
+    "is_dev": true,
     "execute_in": [
       "lxc"
     ],
